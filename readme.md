@@ -25,9 +25,7 @@ This idea aligns with modern **production observability** needs and backend prof
 
 ## Features
 
-- ✅ Wraps all middleware and handlers with `process.hrtime`-based timing
 - ✅ Supports **named middleware** for tagging logs and graphs
-- ✅ Logs duration of each piece of logic with structured metadata
 - ✅ Easy to hook into for flamegraph tooling or log ingestion
 - ⚠️ Minimal Express.js abstraction — just enough to test the idea
 
