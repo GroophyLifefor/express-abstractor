@@ -14,6 +14,8 @@ class Express {
 
   /**
    * Wraps middleware with logging and optional metadata.
+   * Captures timing information and logs start/end of middleware execution.
+   * 
    * @param label - Label for the middleware.
    * @param middleware - The middleware function to wrap.
    * @param meta - Optional metadata to include in logs.
@@ -33,28 +35,32 @@ class Express {
     };
   }
 
-  use(nameOrMiddleware: Middleware | string, middlewareIfNamed?: Middleware) {
+  use(middlewareNameOrFn: Middleware | string, middlewareFn?: Middleware) {
     let middlewareToUse: Middleware;
 
-    if (typeof nameOrMiddleware === 'string') {
-      if (!middlewareIfNamed) {
-        throw new Error(
-          'If you pass a string as the first argument, you must also pass a middleware as the second argument.'
-        );
-      }
+    /**
+     * Cases for middleware registration:
+     * 
+     * 1. String name only (error case)
+     *    ex. app.use('auth'); // Error: Missing middleware function for 'auth'
+     * 
+     * 2. Named middleware function (traced with custom name)
+     *    ex. app.use('auth', checkAuthToken); // Logs as "auth"
+     * 
+     * 3. Direct middleware function (traced as 'Anonymous')
+     *    ex. app.use(checkAuthToken); // Logs as "Anonymous"
+     */
 
-      middlewareToUse = this.wrapMiddleware(
-        nameOrMiddleware,
-        middlewareIfNamed,
-        {
-          type: 'middleware',
-        }
-      );
-    } else {
-      middlewareToUse = this.wrapMiddleware('Anonymous', nameOrMiddleware, {
-        type: 'middleware',
-      });
+    const name = typeof middlewareNameOrFn === 'string' ? middlewareNameOrFn : 'Anonymous';
+    const middleware = typeof middlewareNameOrFn === 'string' ? middlewareFn : middlewareNameOrFn;
+
+    if (typeof middlewareNameOrFn === 'string' && !middlewareFn) {
+      throw new Error(`Missing middleware function for ${middlewareNameOrFn}`);
     }
+
+    middlewareToUse = this.wrapMiddleware(name, middleware, {
+      type: 'middleware'
+    });
 
     this.expressInstance.use(middlewareToUse);
   }
@@ -74,6 +80,7 @@ class Express {
 }
 
 const expressAbstractor = () => new Express();
+
 const log = (message: string, meta?: Record<string, string>) => {
   logWithTags('log', meta);
   console.log(message);
