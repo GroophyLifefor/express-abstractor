@@ -1,7 +1,8 @@
 import coreExpress, { Express as ExpressType } from 'express';
-import { formatHRTime } from './timeFormatter';
+
 import { Handler, Middleware } from './express.types';
-import { endLogWithTags, logWithTags } from "./logging";
+import { endLogWithTags, logWithTags } from './logging';
+import { formatHRTime } from './timeFormatter';
 
 class Express {
   private expressInstance: ExpressType;
@@ -32,7 +33,7 @@ class Express {
 
       logWithTags(label, metaAttributes ? { ...meta } : undefined);
       const hrtime = process.hrtime();
-      await middleware(req, res, next);
+      middleware(req, res, next);
       const [seconds, nanoseconds] = process.hrtime(hrtime);
       const formattedTime = formatHRTime(seconds, nanoseconds);
       endLogWithTags(label, { elapsed: formattedTime });
