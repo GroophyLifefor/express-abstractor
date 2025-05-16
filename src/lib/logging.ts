@@ -51,7 +51,7 @@ const endLogWithTags = (tag: string, meta?: Record<string, string>) => {
   console.groupEnd();
   console.log(
     `</${tag}${metaAttributes ? ' %1' : ''}>`.padEnd(40) +
-      (metaAttributes ? metaAttributes : '')
+      (metaAttributes)
   );
 };
 
