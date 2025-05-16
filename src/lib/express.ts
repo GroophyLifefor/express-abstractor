@@ -24,14 +24,7 @@ class Express {
     meta?: Record<string, any>
   ): Middleware {
     return async (req, res, next) => {
-      const metaAttributes = meta
-        ? Object.entries(meta)
-            .map(([key, value]) => `${key}="${value}"`)
-            .join(' ')
-            .trim()
-        : null;
-
-      logWithTags(label, metaAttributes ? { ...meta } : undefined);
+      logWithTags(label, meta);
       const hrtime = process.hrtime();
       middleware(req, res, next);
       const [seconds, nanoseconds] = process.hrtime(hrtime);
